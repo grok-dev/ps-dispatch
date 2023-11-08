@@ -30,6 +30,9 @@ Config.PhoneItems = { -- Add the entire list of your phone items.
     "phone",
 }
 
+-- Disables dispatch from knowing what weapon shot
+Config.DisableWeaponAlerts = true
+
 -- Locations for the Hunting Zones and No Dispatch Zones( Label: Name of Blip // Radius: Radius of the Alert and Blip)
 Config.EnableHuntingBlip = true
 
