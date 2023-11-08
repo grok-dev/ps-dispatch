@@ -196,6 +196,10 @@ local weaponTable = {
 }
 
 function GetWeaponName()
-    local currentWeapon = GetSelectedPedWeapon(cache.ped)
-    return weaponTable[currentWeapon] or "Unknown"
+    if Config.DisableWeaponAlerts then
+        return "Unknown"
+    else
+        local currentWeapon = GetSelectedPedWeapon(cache.ped)
+        return weaponTable[currentWeapon] or "Unknown"
+    end
 end
