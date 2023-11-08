@@ -27,6 +27,24 @@ local function isPedAWitness(witnesses, ped)
     return false
 end
 
+local function IsGoodWitness(witness)
+    local player = GetPlayerPed(-1)
+    local health = GetEntityHealth(witness)
+
+    -- Witness is an empty vehicle.
+    if IsEntityAVehicle(witness) and GetPedInVehicleSeat(witness, -1) == 0 then return false end
+    -- Witness is not alive.
+    if health <= 0 then return false end
+    -- Witness is the player himself
+    if witness == player then return false end
+    -- Witness is a player
+    if IsPedAPlayer(witness) then return false end
+    -- Witness is nonhuman
+    if not IsPedHuman(witness) then return false end
+
+    return true
+end
+
 AddEventHandler('CEventGunShot', function(witnesses, ped)
     if IsPedCurrentWeaponSilenced(cache.ped) then return end
     if inNoDispatchZone then return end
@@ -47,20 +65,37 @@ AddEventHandler('CEventGunShot', function(witnesses, ped)
 
         if witnesses and not isPedAWitness(witnesses, ped) then return end
 
-        if cache.vehicle then
+        for i=1, #witnesses do
+            if IsGoodWitness(witnesses[i]) then
+                goodWitness = witnesses[i]
+            end
+        end
+
+        if cache.vehicle and goodWitness then
             exports['ps-dispatch']:VehicleShooting()
-        else
+        elseif goodWitness
             exports['ps-dispatch']:Shooting()
         end
     end)
 end)
 
 AddEventHandler('CEventShockingSeenMeleeAction', function(witnesses, ped)
+    -- only allow peds to call 10% of the time
+    if math.random() > .1 then return end
+        
     WaitTimer('Melee', function()
         if cache.ped ~= ped then return end
         if witnesses and not isPedAWitness(witnesses, ped) then return end
 
-        exports['ps-dispatch']:Fight()
+        for i=1, #witnesses do
+            if IsGoodWitness(witnesses[i]) then
+                goodWitness = witnesses[i]
+            end
+        end
+
+        if goodWitness then
+            exports['ps-dispatch']:Fight()
+        end
     end)
 end)
 
